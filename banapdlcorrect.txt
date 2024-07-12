@@ -5,12 +5,12 @@ Finish
 /title,shell
 /prep7
 
-*create,dataread5,mac  !打开变量文件读取参数
+*create,dataread1,mac  !打开变量文件读取参数
 *dim,p,array,1,3
 *vread,p(1,1),F:\guopeiyu\zhuiqiao\012\bianliang,txt,,ijk,1,3
 (5F16.8)
 *END
-dataread5
+dataread1
 
 omega=0   !转/秒
 
@@ -24,7 +24,7 @@ LC0=Lc-L0
 n_zhou=20
 n_yuan=60
 pi=acos(-1)
-t=0.002
+t=0.002                                                          
 R01=R0-t
 Rc1=RC-t
 !ET,1,SHELL281        ! SHELL ELEMENTS TO MODEL STEEL RING
@@ -46,7 +46,7 @@ VSBV,2,3,sepo,delete,delete!利用前一个减去后一个圆锥，生成壳
 allsel,all
 esize,0.01,0
 mshkey,1!1为采用映射网格，0为自由，2为部分映射，部分自由，生成四面体单元
-vsweep,all!这里采用vsweep而不用vmesh，报错原因未知
+vsweep,all !这里采用vsweep而不用vmesh，报错原因未知
 !vmesh,all
 
 
@@ -70,16 +70,10 @@ TOFFST,273 !定义温度偏移量
 ALLSEL,ALL
 !p(1,4)=0.000020673
 !p(1,5)=0.000000105033
-*DO,I,1,100
+*DO,I,1,400
 T=2*I
-*create,dataread5,mac  !打开变量文件读取参数
-*dim,p,array,1,3
-*vread,p(1,1),F:\guopeiyu\zhuiqiao\012\bianliang,txt,,ijk,1,3
-(5F16.8)
-*END
-dataread5
 !SF,ALL,HFLUX,p(1,1)*SIN(T)+p(1,2)*COS(T)+p(1,3)*T*T+p(1,4)*T
-WENDU=p(1,1)+p(1,2)*T+p(1,3)*T*T!因为ansys命令流太长会报错，所以在这里减少长度
+WENDU=p(1,1)*EXP(-(T-p(1,2))*(T-p(1,2))/p(1,3))!因为ansys命令流太长会报错，所以在这里减少长度
 
 SFA,5,1,CONV,125,0.636*WENDU !!在5号面上施加对流换热载荷，换热系数125w/m2*k,热场温度800
 SFA,6,1,CONV,125,0.636*WENDU
@@ -157,38 +151,39 @@ VGET,JGSHUZU2,3!获取第二个测量点温度值
 *DIM,JGSHUZU3,ARRAY,400         
 VGET,JGSHUZU3,4!获取第三个测量点温度值
 
-*CREATE,DATAWRITE6,MAC   
-*CFOPEN,F:\guopeiyu\zhuiqiao\012\result1,txt
-*DO,I,1,100
+*CREATE,DATAWRITE2,MAC   
+*CFOPEN,F:\guopeiyu\zhuiqiao\012\celiang1,txt
+*DO,I,1,400
 AA=JGSHUZU(I)
 *VWRITE,AA
 (F22.15)
 *ENDDO
 *CFCLOS
 *END
-*USE,DATAWRITE6.MAC     
+*USE,DATAWRITE2.MAC     
 finish
 
-*CREATE,DATAWRITE7,MAC   
-*CFOPEN,F:\guopeiyu\zhuiqiao\012\result2,txt
-*DO,I,1,100
+*CREATE,DATAWRITE3,MAC   
+*CFOPEN,F:\guopeiyu\zhuiqiao\012\celiang2,txt
+*DO,I,1,400
 AA=JGSHUZU2(I)
 *VWRITE,AA
 (F22.15)
 *ENDDO
 *CFCLOS
 *END
-*USE,DATAWRITE7.MAC     
+*USE,DATAWRITE3.MAC     
 finish
 
-*CREATE,DATAWRITE8,MAC   
-*CFOPEN,F:\guopeiyu\zhuiqiao\012\result3,txt
-*DO,I,1,100
+*CREATE,DATAWRITE4,MAC   
+*CFOPEN,F:\guopeiyu\zhuiqiao\012\celiang3,txt
+*DO,I,1,400
 AA=JGSHUZU3(I)
 *VWRITE,AA
 (F22.15)
 *ENDDO
 *CFCLOS
 *END
-*USE,DATAWRITE8.MAC     
+*USE,DATAWRITE4.MAC     
 finish
+
